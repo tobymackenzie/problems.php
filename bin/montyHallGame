@@ -1,0 +1,27 @@
+#!/usr/bin/env php
+<?php
+require_once(__DIR__ . '/../src/MontyHallGame.php');
+$doorCount = (isset($argv[1]) ? $argv[1] : 3);
+$hostDoorCount = (isset($argv[2]) ? $argv[2] : 1);
+
+$iterationCount = 100000;
+$iterations = 0;
+$switchedFromIterations = 0;
+$switchedToIterations = 0;
+
+for($i = 1; $i <= $iterationCount; ++$i){
+	$game = new MontyHallGame(Array(
+		'doorCount'=> $doorCount
+		,'hostDoorCount'=> $hostDoorCount
+	));
+	++$iterations;
+	if($game->getSwitchedFromCar()){
+		++$switchedFromIterations;
+	}
+	if($game->getSwitchedToCar()){
+		++$switchedToIterations;
+	}
+	// var_dump($game);
+}
+
+echo "Switch would be from the car " . ($switchedFromIterations / $iterations * 100) . '% of the time and to the car ' . ($switchedToIterations / $iterations * 100) . '% of the time.';

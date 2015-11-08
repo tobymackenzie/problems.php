@@ -17,6 +17,11 @@ class MontyHallGame{
 		if(isset($opts['hostDoorCount'])){
 			$this->hostDoorCount = $opts['hostDoorCount'];
 		}
+		if($this->hostDoorCount > $this->doorCount){
+			throw new Exception("Can't have more host doors than total doors.");
+		}elseif($this->hostDoorCount > $this->doorCount - 2){
+			throw new Exception("Not enough doors for the host to open his count and still have enough to switch.");
+		}
 
 		//--game
 		//---put car behind door
@@ -24,20 +29,19 @@ class MontyHallGame{
 		//---player selects door
 		$this->playerDoor = mt_rand(1,$this->doorCount);
 		//---host selects door(s)
-		$randModifier = ($this->carDoor === $this->playerDoor) ? $this->doorCount - 1 : $this->doorCount - 2;
+		$hostAvailableDoors = ($this->carDoor === $this->playerDoor) ? $this->doorCount - 1 : $this->doorCount - 2;
 		for($i = 0; $i < $this->hostDoorCount; ++$i){
-			$this->hostDoors[$i] = mt_rand(1, $randModifier);
-			if($this->hostDoors[$i] === $this->playerDoor){
-				++$this->hostDoors[$i];
-			}
+			$this->hostDoors[$i] = mt_rand(1, $hostAvailableDoors);
 			while($this->hostDoors[$i] === $this->playerDoor || $this->hostDoors[$i] === $this->carDoor){
 				++$this->hostDoors[$i];
 			}
+			--$hostAvailableDoors;
 		}
 		//---determine if player switch would move away from car
 		$this->switchedFromCar = ($this->carDoor === $this->playerDoor);
 		//---determine if player switch would move to car
-		$this->newPlayerDoor = mt_rand(1, $this->doorCount - 2);
+		$remainingDoors = $this->doorCount - 1 - $this->hostDoorCount;
+		$this->newPlayerDoor = mt_rand(1, $remainingDoors);
 		while($this->newPlayerDoor === $this->playerDoor || in_array($this->newPlayerDoor, $this->hostDoors)){
 			++$this->newPlayerDoor;
 		}
